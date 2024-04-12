@@ -1,13 +1,13 @@
 # Summary #
 This project analyzes the climate of Honolulu, Hawaii provided in a SQLite database. The database provides datapoints across 9 stations where precipitation (in inches) and temperatures (in farenehit) are observed over 17 years (2010-2017) in Honolulu.  SQLAlchemy was used to translate python querying to the SQLite database. The resulting precipitation and temperatures of the last year were plotted using Matplotlib. 
 
-The results queries were then translated into a Flask app to create endpoints that other users can use to view the data for precipitation, temperature observations, and stations. Additionally, two endpoints allow users to dynamically enter a given start date or a date range to query min, max, and average temperatures for those dates. 
+The results queries were then translated into a Flask app to create endpoints that other users can use to view the data for precipitation, temperature observations, and stations for the last year of data. Additionally, two endpoints allow users to dynamically enter a given start date or a date range to query min, max, and average temperatures for those dates. 
 
 See included Jupyter notebook and app.py file for details and conclusions.
 
 # Note on using endpoints #
 ## Precipitation, temperature observations, and stations endpoints ##
-Links are provided on the home page for precipitation, temperature observations, and stations or the listed texts can be copied and pasted after the home url in the browser to reach the same destination.
+Links are provided on the home page for precipitation, temperature observations, and stations or the listed texts can be copied and pasted after the home url in the browser to reach the same destination. These endpoints will return datapoints for the last year in the dataset. 
 
 ## Endpoints using start date or date rante (i.e., start and end date) ##
 ### Start date ###

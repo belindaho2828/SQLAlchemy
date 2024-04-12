@@ -16,14 +16,14 @@ from flask import Flask, jsonify, request
 engine = create_engine("sqlite:///Resources/hawaii.sqlite")
 
 # reflect an existing database into a new model
-Base = automap_base()
+base = automap_base()
 
 # reflect the tables
-Base.prepare(autoload_with = engine)
+base.prepare(autoload_with = engine)
 
 # Save references to each table
-Measurement = Base.classes.measurement
-Station = Base.classes.station
+measurement = base.classes.measurement
+station = base.classes.station
 
 # Create our session (link) from Python to the DB
 session = scoped_session(sessionmaker(bind=engine))
@@ -64,14 +64,14 @@ def home():
 @app.route('/api/v1.0/precipitation')
 def precip():
     #determine most recent date in the data set
-    recent_date = session.query(Measurement.date).order_by(Measurement.date.desc()).first()
+    recent_date = session.query(measurement.date).order_by(measurement.date.desc()).first()
 
     # Calculate the date one year from the last date in data set.
     year_ago = dt.date(2017, 8, 23) - dt.timedelta(days = 365)
 
     #query to retrieve the data and precipitation scores
-    precip_results = session.query(Measurement.date, Measurement.prcp).filter(Measurement.date <= recent_date[0]).\
-                filter(Measurement.date >= year_ago).all()
+    precip_results = session.query(measurement.date, measurement.prcp).filter(measurement.date <= recent_date[0]).\
+                filter(measurement.date >= year_ago).all()
     
      #create dictionary to jsonify
     precip_dict = [{'date': date, 'prcp':precip} for date, precip in precip_results]
@@ -82,7 +82,7 @@ def precip():
 @app.route('/api/v1.0/stations')
 def stations():
     #query for list of stations
-    stations = session.query(Station.station).all()
+    stations = session.query(station.station).all()
 
     stations_list = [station[0] for station in stations]
     return jsonify(stations_list)
@@ -92,24 +92,24 @@ def stations():
 @app.route('/api/v1.0/tobs')
 def tobs():
     #most active stations query
-    most_active = session.query(Measurement.station, func.count(Measurement.station)).group_by(Measurement.station).order_by(func.count(Measurement.station).desc()).all()
+    most_active = session.query(measurement.station, func.count(measurement.station)).group_by(measurement.station).order_by(func.count(measurement.station).desc()).all()
     #most recent date and year-ago date
-    recent_date = session.query(Measurement.date).order_by(Measurement.date.desc()).first()
+    recent_date = session.query(measurement.date).order_by(measurement.date.desc()).first()
     year_ago = dt.date(2017, 8, 23) - dt.timedelta(days = 365)
     #query for dates and temp observations of most-active station for the previous year of data
-    recent_date = session.query(Measurement.date).order_by(Measurement.date.desc()).first()
+    recent_date = session.query(measurement.date).order_by(measurement.date.desc()).first()
 
     #get most active station
     most_active_id = most_active[0][0]
     #function for min, max, avg temps
-    sel = [Measurement.station, 
-       func.min(Measurement.tobs),
-       func.max(Measurement.tobs),
-       func.avg(Measurement.tobs)]
+    sel = [measurement.station, 
+       func.min(measurement.tobs),
+       func.max(measurement.tobs),
+       func.avg(measurement.tobs)]
     
     #query last 12 months of tob for most active station
-    temp_results = session.query(Measurement.date, Measurement.tobs).filter(Measurement.date <= recent_date[0]).filter(Measurement.date >= year_ago).\
-                filter(Measurement.station == most_active[0][0]).all()
+    temp_results = session.query(measurement.date, measurement.tobs).filter(measurement.date <= recent_date[0]).filter(measurement.date >= year_ago).\
+                filter(measurement.station == most_active[0][0]).all()
     
     #create dictionary to jsonify
     temp_dict = [{'date': date, 'temp':temp} for date, temp in temp_results]
@@ -118,13 +118,13 @@ def tobs():
 @app.route('/api/v1.0/start/<start>')
 def start_date(start):
      #function for min, max, avg temps
-    sel_1 = [Measurement.date, 
-       func.min(Measurement.tobs),
-       func.max(Measurement.tobs),
-       func.avg(Measurement.tobs)]
+    sel_1 = [measurement.date, 
+       func.min(measurement.tobs),
+       func.max(measurement.tobs),
+       func.avg(measurement.tobs)]
     
     #filter temp for all dates including and after given start date
-    start_temps = session.query(*sel_1).filter(Measurement.date >= start).group_by(Measurement.date).all()
+    start_temps = session.query(*sel_1).filter(measurement.date >= start).group_by(measurement.date).all()
 
      #create dictionary to jsonify
     start_temp_dict = [{'date':date, 'min. temp.':min, 'max. temp.':max, 'avg. temp.':avg} for date, min, max, avg in start_temps]
@@ -133,14 +133,14 @@ def start_date(start):
 @app.route('/api/v1.0/start/<start>/end/<end>')
 def start_end(start, end):
     #function for min, max, avg temps
-    sel_2 = [Measurement.date, 
-       func.min(Measurement.tobs),
-       func.max(Measurement.tobs),
-       func.avg(Measurement.tobs)]
+    sel_2 = [measurement.date, 
+       func.min(measurement.tobs),
+       func.max(measurement.tobs),
+       func.avg(measurement.tobs)]
     
     #filter temp for all dates in given date rate, inclusive
-    start_end_temps = session.query(*sel_2).filter(Measurement.date >= start).filter(Measurement.date <= end).\
-                    group_by(Measurement.date).all()
+    start_end_temps = session.query(*sel_2).filter(measurement.date >= start).filter(measurement.date <= end).\
+                    group_by(measurement.date).all()
     
      #create dictionary to jsonify
     start_end_dict = [{'date':date, 'min. temp.':min, 'max. temp.':max, 'avg. temp.':avg} for date, min, max, avg in start_end_temps]

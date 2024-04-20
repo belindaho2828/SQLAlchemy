@@ -15,17 +15,17 @@ from flask import Flask, jsonify, request
 #################################################
 engine = create_engine("sqlite:///Resources/hawaii.sqlite")
 
-# reflect an existing database into a new model
+# reflecting an existing database into a new model
 base = automap_base()
 
-# reflect the tables
+# reflecting existing tables
 base.prepare(autoload_with = engine)
 
-# Save references to each table
+# Saving references to each table
 measurement = base.classes.measurement
 station = base.classes.station
 
-# Create our session (link) from Python to the DB
+# Creating session from Python to the DB
 session = scoped_session(sessionmaker(bind=engine))
 
 #################################################
@@ -63,13 +63,13 @@ def home():
 
 @app.route('/api/v1.0/precipitation')
 def precip():
-    #determine most recent date in the data set
+    #determining most recent date in the data set
     recent_date = session.query(measurement.date).order_by(measurement.date.desc()).first()
 
-    # Calculate the date one year from the last date in data set.
+    # Calculating the date one year from the last date in data set.
     year_ago = dt.date(2017, 8, 23) - dt.timedelta(days = 365)
 
-    #query to retrieve the data and precipitation scores
+    #querying to retrieve the data and precipitation scores of the last year
     precip_results = session.query(measurement.date, measurement.prcp).filter(measurement.date <= recent_date[0]).\
                 filter(measurement.date >= year_ago).all()
     
@@ -81,17 +81,17 @@ def precip():
 
 @app.route('/api/v1.0/stations')
 def stations():
-    #query for list of stations
+    #querying for list of stations
     stations = session.query(station.station).all()
 
     stations_list = [station[0] for station in stations]
     return jsonify(stations_list)
 
-    #for station in stations:
+    
 
 @app.route('/api/v1.0/tobs')
 def tobs():
-    #most active stations query
+    #querying most active stations 
     most_active = session.query(measurement.station, func.count(measurement.station)).group_by(measurement.station).order_by(func.count(measurement.station).desc()).all()
     #most recent date and year-ago date
     recent_date = session.query(measurement.date).order_by(measurement.date.desc()).first()

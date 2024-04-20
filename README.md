@@ -19,5 +19,3 @@ Providing a date range will return min, max, and average temperatures for all da
 # Tools Used #
 Python, Pandas, SQLAlchemy, Matplotlib, Numpy, Flask
 
-# Acknowledgments #
-I used online resources (Stack Overflow, etc.) and chatted with colleagues for debugging of similar issues.
